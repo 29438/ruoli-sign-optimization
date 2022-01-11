@@ -1,20 +1,25 @@
-## 声明
+📃免责声明
+本项目为Python学习交流的开源非营利项目，仅作为程序员之间相互学习交流之用，使用需严格遵守开源许可协议。严禁用于商业用途，禁止使用本项目进行任何盈利活动。对一切非法使用所产生的后果，我们概不负责。本项目对您如有困扰请联系我们删除。
 
-本项目为Python学习交流的开源非营利项目，仅作为程序员之间相互学习交流之用。
+📗使用方法
+🔑常规部署
+安装Python3.6+环境
+下载并解压项目代码包
+修改config.yml文件中的相关配置内容
+运行pip install -r requirements.txt -t ./ -i https://mirrors.aliyun.com/pypi/simple安装项目依赖
+执行Python index.py即可运行项目
+🚀快速部署
+Linux环境可以直接使用下方命令一键部署
 
-严禁用于商业用途，禁止使用本项目进行任何盈利活动。
+curl -sSO https://raw.fastgit.org/29438/ruoli-sign-optimization/master/actions/setup.sh && bash setup.sh
 
-使用者请遵从相关政策。对一切非法使用所产生的后果，我们概不负责。
-
-本项目对您如有困扰请联系我们删除。
-
-## 公告
+📢 公告
 
 * 2021-11-7更新，配置文件有修改(<u>请**删掉**配置中不需要用到的**可选项**</u>，不然会出现"今日校园版本过旧，请更新")
 * 2021-12-16更新，[pushplus](https://pushplus.hxtrip.com/index)使用方式更新，需要重新配置
 * 发现bug记得提交issue
 
-## 修改摘要
+🛠 修改摘要
 
 ### 整体修改
 
