@@ -6,7 +6,7 @@ author: 若离|IceTiki|https://github.com/IceTiki/ruoli-sign-optimization
 locationOffsetRange: 50 # 坐标偏移范围(单位：米)(可以为0)
 maxTry: 1 # 最大尝试次数
 logDir: 'log/' # 日志保存地址
-delay: [1,3] # 多用户时，各用户之间任务执行延迟(时间范围可以使用浮点数)
+delay: [2.5,5] # 多用户时，各用户之间任务执行延迟(时间范围可以使用浮点数)
 sendMessage: # 推送函数的整体运行情况
   rl_emailApiUrl: http://mail.ruoli.cc/api/sendMail # 邮箱API的地址(不需要推送不用填)
   rl_email: "" # email 接受通知消息的邮箱(不需要推送不用填)
@@ -22,7 +22,7 @@ sendMessage: # 推送函数的整体运行情况
     - "*****@qq.com" # 接收邮箱(可填多个)
 # ======================================================================
 # 用户组配置(填写自己所需的类型，并删掉不需要的。可以多用户签到。)
-# ======================================================================代理proxy: "http://host:port"
+# ======================================================================自定义代理proxy: "http://host:port"
 users: # ------别误删了这一行------可添加【getHistorySign: True # 获取历史表单功能启动】目前（仅签到任务）支持获取上次填报的表单、位置信息进行填报。（会忽略配置问卷中已有的表单和位置信息）
   - # 信息收集模板=======
     # 通用必填项-------
@@ -52,7 +52,7 @@ users: # ------别误删了这一行------可添加【getHistorySign: True # 获
     schoolName: 芜湖职业技术学院 # 学校全称
     username: "" # 学号或者工号
     password: "" # 密码
-    getHistorySign: True # 获取历史表单功能启动(True、False)
+    getHistorySign: True # 获取历史表单功能启动(True or False)
     # 一般需填项-------
     abnormalReason: "" # abnormalReason 反馈信息（这个一般不用配置，但是不能删除，删除会报错）
     photo: sign.jpg # 签到照片，不需要可不填。如果填入文件夹路径或路径列表，则会自动从中随机选择图片(.jpg)
