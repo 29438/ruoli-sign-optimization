@@ -250,7 +250,7 @@ class CT:
 
         text = base64.b64decode(text)  # Base64解码
         text = cipher.decrypt(text)  # 解密
-        text = text.decode(CT.charset)  # 解码
+        text = text.decode(CT.charset)  # 解码 
         text = CT.pkcs7unpadding(text)  # 删除填充
         return text
 
