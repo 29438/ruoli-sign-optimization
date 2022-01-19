@@ -12,7 +12,7 @@
 
 修改config.yml文件中的相关配置内容
 
-运行【 pip install -r requirements.txt -t ./ -i https://mirrors.aliyun.com/pypi/simple 】安装项目依赖
+运行 <pre>pip install -r requirements.txt -t ./ -i https://mirrors.aliyun.com/pypi/simple</pre> 安装项目依赖
 
 执行 Python index.py 即可运行项目
 
@@ -20,7 +20,7 @@
 
 Linux环境可以直接使用下方命令一键部署
 
-curl -sSO https://raw.fastgit.org/29438/ruoli-sign-optimization/master/actions/setup.sh && bash setup.sh
+ <pre>curl -sSO https://raw.fastgit.org/29438/ruoli-sign-optimization/master/actions/setup.sh && bash setup.sh</pre>
 
 📅示例 腾讯云函数平台
 
@@ -367,3 +367,49 @@ Cron表达式填```15 0,8 * * *```(意思是每天0点和8点15分触发)
 
 ![image-20210808215517157](README.assets/image-20210808215517157.png)
 
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"></script>
+<script>
+    $("pre").mouseover(function (e) {
+        var _that = $(this);
+        _that.css("position", "relative");
+        _that.addClass("activePre");
+        var copyBtn = _that.find('.copyBtn');
+        if (!copyBtn || copyBtn.length <= 0) {
+            var copyBtn = '<span class="copyBtn" style="position:absolute;top:2px;right:2px;z-index:999;padding:2px;font-size:13px;background-color: white;cursor: pointer;" >复制</span>';
+            _that.append(copyBtn);
+        }
+    }).mouseout(function (e) {
+        var _that = $(this);
+        var copyBtn = _that.find('.copyBtn');
+        var copyBtnHover = _that.find('.copyBtn:hover');
+        if (copyBtnHover.length == 0) {
+            copyBtn.remove();
+            _that.removeClass("activePre");
+        }
+    });
+    function copyCode() {
+        var activePre = $(".activePre");
+        if (!activePre || activePre.length <= 0) {
+            return;
+        }
+        activePre = activePre[0];
+        var clone = $(activePre).clone();
+        clone.find('.copyBtn').remove();
+        var clipboard = new ClipboardJS('.copyBtn', {
+            text: function () {
+                return clone.text();
+            }
+        });
+        clipboard.on("success", function (e) {
+            $(".copyBtn").html("复制成功");
+            clipboard.destroy();
+            clone.remove();
+        });
+ 
+        clipboard.on("error", function (e) {
+            clipboard.destroy();
+            clone.remove();
+        });
+    }
+</script>
