@@ -268,7 +268,7 @@ class CT:
     @staticmethod
     def encrypt_CpdailyExtension(text):
         '''CpdailyExtension加密'''
-        key = 'b3L26XNL'
+        key = 'XCE927=='
         iv = b"\x01\x02\x03\x04\x05\x06\x07\x08"
         d = des(key, CBC, iv, pad=None, padmode=PAD_PKCS5)
 
@@ -280,7 +280,7 @@ class CT:
     @staticmethod
     def decrypt_CpdailyExtension(text):
         '''CpdailyExtension加密'''
-        key = 'b3L26XNL'
+        key = 'XCE927=='
         iv = b"\x01\x02\x03\x04\x05\x06\x07\x08"
         d = des(key, CBC, iv, pad=None, padmode=PAD_PKCS5)
 
