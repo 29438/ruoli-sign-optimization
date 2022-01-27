@@ -163,7 +163,7 @@ def main():
         msg += '[%s]\n%s\n' % (i['remarkName'], i['state'])
     LL.log(1, msg)
     sm = SendMessage(config.get('sendMessage'))
-    sm.send(msg+'\n'+LL.getLog(4), '自动健康打卡')
+    sm.send(msg+'\n'+LL.getLog(4), '今日校园自动打卡')
     LL.log(1, sm.log_str)
 
 
