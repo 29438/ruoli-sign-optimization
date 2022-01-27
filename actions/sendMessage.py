@@ -4,7 +4,6 @@ from email.mime.text import MIMEText
 from email.header import Header
 import re
 from urllib import parse
-import json
 
 
 # 通知类
@@ -18,8 +17,7 @@ class SendMessage:
                          con.get('smtp_key'), con.get('smtp_sender'), con.get('smtp_receivers'))
         self.rl = RlMessage(con.get('rl_email'),
                             con.get('rl_emailApiUrl'))
-        self.pp = Pushplus(con.get('pushplus_parameters'),
-                           con.get('pushplus_isNew'))
+        self.pp = Pushplus(con.get('pushplus_parameters'))
         self.log_str = '推送情况\n'
 
     def send(self, msg='no msg', title='no title'):
@@ -70,8 +68,7 @@ class RlMessage:
                 'title': title,
                 'content': msg
             }
-            res = requests.post(url=self.apiUrl, params=json.dumps(params))
-            res = res.json()
+            res = requests.post(url=self.apiUrl, params=params).json()
             return res['message']
         else:
             return '邮箱或邮件api填写无效，已取消发送邮件！'
@@ -80,15 +77,11 @@ class RlMessage:
 class Pushplus:
     '''Pushplus推送类'''
 
-    def __init__(self, parameters: str, isNew):
+    def __init__(self, parameters: str):
         """
         :param parameters: "xxx"形式的令牌 或者 "token=xxx&topic=xxx&yyy=xxx"形式参数列表
         """
         self.parameters = parameters
-        if isNew:
-            self.api = "https://www.pushplus.plus/send"
-        else:
-            self.api = "https://pushplus.hxtrip.com/send"
         self.configIsCorrect = self.isCorrectConfig()
 
     def isCorrectConfig(self):
@@ -105,25 +98,22 @@ class Pushplus:
         title = str(title)
 
         if self.configIsCorrect:
-            # 解析参数
-            if "=" in self.parameters:  # 如果是url形式的参数
-                params = parse.parse_qs(
-                    parse.urlparse(self.parameters).path)  # 解析参数
-                params = {k: params.copy()[k][0]
-                          for k in params.copy()}  # 解析参数
+            if "=" in self.parameters:
+                params = parse.parse_qs(parse.urlparse(self.parameters).path)
+                for k in params:
+                    params[k] = params[k][0]
                 params.update({'title': title, 'content': msg})
-            else:  # 如果参数是token本身
+            else:
                 params = {
                     'token': self.parameters,
                     'title': title,
                     'content': msg,
                 }
-            # 准备发送
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0'
             }
             res = requests.post(
-                self.api, headers=headers, params=params)
+                "https://pushplus.hxtrip.com/send", headers=headers, params=params)
             if res.status_code == 200:
                 return "发送成功"
             else:
@@ -162,16 +152,12 @@ class Qmsg:
     def send(self, msg):
         """发送消息
         :param msg: 要发送的消息(自动转为字符串类型)"""
-        # msg处理
+        # msg：要发送的信息|消息推送函数
         msg = str(msg)
-        # 替换数字(避开qmsg的屏蔽规则)
-        for i, k in zip(list('0123456789'), list('𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗')):
-            msg = msg.replace(i, k)
         # 简单检查配置
         if not self.configIsCorrect:
             return('Qmsg配置错误，信息取消发送')
         else:
-            # 开始推送
             sendtype = 'group/' if self.isGroup else 'send/'
             res = requests.post(url='https://qmsg.zendee.cn/'+sendtype +
                                 self.key, data={'msg': msg, 'qq': self.qq})

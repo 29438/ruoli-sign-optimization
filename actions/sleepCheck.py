@@ -114,16 +114,15 @@ class sleepCheck:
             "deviceId": self.userInfo['deviceId']
         }
 
-        self.cpdailyExtension = CpdailyTools.encrypt_CpdailyExtension(
+        self.cpdailyExtension = CT.encrypt_CpdailyExtension(
             json.dumps(extension))
 
-        self.bodyString = CpdailyTools.encrypt_BodyString(
-            json.dumps(self.form))
+        self.bodyString = CT.encrypt_BodyString(json.dumps(self.form))
 
         self.submitData = {
             "lon": self.userInfo['lon'],
-            "version": self.userInfo['signVersion'],
-            "calVersion": self.userInfo['calVersion'],
+            "version": "first_v2",
+            "calVersion": "firstv",
             "deviceId": self.userInfo['deviceId'],
             "userId": self.userInfo['username'],
             "systemName": self.userInfo['systemName'],
@@ -134,7 +133,10 @@ class sleepCheck:
             "model": self.userInfo['model'],
         }
 
-        self.submitData['sign'] = CpdailyTools.signAbstract(self.submitData)
+        sign = ''.join("%s=%s&" % (i, self.submitData[i]) for i in [
+                       "appVersion", "bodyString", "deviceId", "lat", "lon", "model", "systemName", "systemVersion", "userId"]) + "ytUQ7l2ZZu8mLvJZ"
+        sign = HSF.strHash(sign, 5)
+        self.submitData['sign'] = sign
 
     # 提交签到信息
     def submitForm(self):
