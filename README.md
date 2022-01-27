@@ -57,7 +57,7 @@ curl -sSO https://raw.fastgit.org/29438/ruoli-sign-optimization/master/actions/s
 
 📢 公告
 
-* 2021-11-7更新，秘钥升级
+* 2022-1-27更新，秘钥升级
 * 2021-11-7更新，配置文件有修改(<u>请**删掉**配置中不需要用到的**可选项**</u>，不然会出现"今日校园版本过旧，请更新")
 * 2021-12-16更新，[pushplus](https://pushplus.hxtrip.com/index)使用方式更新，需要重新配置
 * 发现bug记得提交issue
