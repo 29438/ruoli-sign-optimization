@@ -10,7 +10,7 @@ Get_Pack_Manager(){
 
 Set_Auto_Cpdaily(){
 	echo "开始下载项目代码"
-	wget --no-check-certificate -O code.zip https://raw.fastgit.org/29438/ruoli-sign-optimization/archive/refs/heads/master.zip
+	wget --no-check-certificate -O code.zip https://github.com.cnpmjs.org/29438/ruoli-sign-optimization/archive/refs/heads/master.zip
 	echo "开始解压项目代码"
 	unzip -o code.zip
 	echo "开始初始化项目依赖"
