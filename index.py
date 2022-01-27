@@ -21,7 +21,7 @@ def loadConfig():
         LL.log(1, f"正在初始化{user['username']}的配置")
         # 初始化静态配置项目
         defaultConfig = {
-            'remarkName': '默认备注名',
+            'remarkName': '今日校园用户',
             'state': None,
             'model': 'OPPO R11 Plus',
             'appVersion': '9.0.14',
