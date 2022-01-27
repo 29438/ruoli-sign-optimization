@@ -119,7 +119,7 @@ class Collection:
                 formItem['sortNum'] = str(formItem['sort'])  # 盲猜是sort排序
                 # 开始填充表单
                 # 文本选项直接赋值
-                if formItem['fieldType'] in ('1','5','6','7'):
+                if formItem['fieldType'] in ('1', '5', '6', '7'):
                     formItem['value'] = userForm['value']
                 # 单选框填充
                 elif formItem['fieldType'] == '2':
@@ -209,15 +209,16 @@ class Collection:
             "deviceId": self.userInfo['deviceId']
         }
 
-        self.cpdailyExtension = CT.encrypt_CpdailyExtension(
+        self.cpdailyExtension = CpdailyTools.encrypt_CpdailyExtension(
             json.dumps(extension))
 
-        self.bodyString = CT.encrypt_BodyString(json.dumps(self.form))
+        self.bodyString = CpdailyTools.encrypt_BodyString(
+            json.dumps(self.form))
 
         self.submitData = {
             "lon": self.userInfo['lon'],
-            "version": "first_v2",
-            "calVersion": "firstv",
+            "version": self.userInfo['signVersion'],
+            "calVersion": self.userInfo['calVersion'],
             "deviceId": self.userInfo['deviceId'],
             "userId": self.userInfo['username'],
             "systemName": self.userInfo['systemName'],
@@ -228,10 +229,7 @@ class Collection:
             "model": self.userInfo['model'],
         }
 
-        sign = ''.join("%s=%s&" % (i, self.submitData[i]) for i in [
-                       "appVersion", "bodyString", "deviceId", "lat", "lon", "model", "systemName", "systemVersion", "userId"]) + "ytUQ7l2ZZu8mLvJZ"
-        sign = HSF.strHash(sign, 5)
-        self.submitData['sign'] = sign
+        self.submitData['sign'] = CpdailyTools.signAbstract(self.submitData)
 
     # 提交表单
     def submitForm(self):
