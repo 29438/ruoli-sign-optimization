@@ -8,11 +8,75 @@ from Crypto.Cipher import AES
 from pyDes import des, CBC, PAD_PKCS5
 import base64
 import hashlib
+import urllib.parse
 
 
 class TaskError(Exception):
     '''目前(配置/时间/签到情况)不宜完成签到任务'''
     pass
+
+
+class CpdailyTools:
+    '''今日校园相关函数'''
+    desKey = 'XCE927=='
+    aesKey = b"SASEoK4Pa5d4SssO"
+    aesKey_str = "SASEoK4Pa5d4SssO"
+
+    @staticmethod
+    def encrypt_CpdailyExtension(text, key=desKey):
+        '''CpdailyExtension加密'''
+        iv = b"\x01\x02\x03\x04\x05\x06\x07\x08"
+        d = des(key, CBC, iv, pad=None, padmode=PAD_PKCS5)
+
+        text = d.encrypt(text)  # 加密
+        text = base64.b64encode(text)  # base64编码
+        text = text.decode()  # 解码
+        return text
+
+    @staticmethod
+    def decrypt_CpdailyExtension(text, key=desKey):
+        '''CpdailyExtension加密'''
+        iv = b"\x01\x02\x03\x04\x05\x06\x07\x08"
+        d = des(key, CBC, iv, pad=None, padmode=PAD_PKCS5)
+
+        text = base64.b64decode(text)  # Base64解码
+        text = d.decrypt(text)  # 解密
+        text = text.decode()  # 解码
+        return text
+
+    @staticmethod
+    def encrypt_BodyString(text, key=aesKey):
+        """BodyString加密"""
+        iv = b'\x01\x02\x03\x04\x05\x06\x07\x08\t\x01\x02\x03\x04\x05\x06\x07'
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+
+        text = CT.pkcs7padding(text)  # 填充
+        text = text.encode(CT.charset)  # 编码
+        text = cipher.encrypt(text)  # 加密
+        text = base64.b64encode(text).decode(CT.charset)  # Base64编码
+        return text
+
+    @staticmethod
+    def decrypt_BodyString(text, key=aesKey):
+        """BodyString解密"""
+        iv = b'\x01\x02\x03\x04\x05\x06\x07\x08\t\x01\x02\x03\x04\x05\x06\x07'
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+
+        text = base64.b64decode(text)  # Base64解码
+        text = cipher.decrypt(text)  # 解密
+        text = text.decode(CT.charset)  # 解码
+        text = CT.pkcs7unpadding(text)  # 删除填充
+        return text
+
+    @staticmethod
+    def signAbstract(submitData: dict, key=aesKey_str):
+        '''表单中sign项目生成'''
+        abstractKey = ["appVersion", "bodyString", "deviceId", "lat",
+                       "lon", "model", "systemName", "systemVersion", "userId"]
+        abstractSubmitData = {k: submitData[k] for k in abstractKey}
+        abstract = urllib.parse.urlencode(abstractSubmitData) + '&' + key
+        abstract_md5 = HSF.strHash(abstract, 5)
+        return abstract_md5
 
 
 class MT:
@@ -29,6 +93,20 @@ class MT:
             math.cos(lat2) * math.sin(dlon/2)**2
         distance = 2*math.asin(math.sqrt(a))*6371393  # 地球平均半径，6371393m
         return distance
+
+
+class PseudoRandom:
+    '''随机数种子临时固定类(用于with语句)'''
+
+    def __init__(self, seed=time.time()):
+        self.seed = str(seed)
+        random.seed(self.seed, version=2)
+
+    def __enter__(self):
+        return self.seed
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        random.seed(str(time.time()), version=2)
 
 
 class RT:
@@ -128,18 +206,17 @@ class RT:
         a = timeRange[0]
         b = timeRange[1]
         sleepTime = random.uniform(a, b)
-        LL.log(0, '程序正在暂停%.3f秒'%sleepTime)
+        LL.log(0, '程序正在暂停%.3f秒' % sleepTime)
         time.sleep(sleepTime)
 
     @staticmethod
-    def genDeviceID(seed):
-        '''根据种子伪随机生成uuid'''
-        random.seed(seed, version=2)  # 种子设置
-        def ranHex(x): return ''.join(
-            random.choices('0123456789ABCDEF', k=x))  # 指定长度随机Hex字符串生成
-        deviceId = "-".join([ranHex(8), ranHex(4), ranHex(4),
-                            ranHex(4), ranHex(12)])  # 拼合字符串
-        random.seed(str(time.time()), version=2) # 随机化种子(避免影响到其他随机功能)
+    def genDeviceID(seed=time.time()):
+        '''根据种子生成uuid'''
+        with PseudoRandom(seed):
+            def ranHex(x): return ''.join(
+                random.choices('0123456789ABCDEF', k=x))  # 指定长度随机Hex字符串生成
+            deviceId = "-".join([ranHex(8), ranHex(4), ranHex(4),
+                                ranHex(4), ranHex(12)])  # 拼合字符串
         return deviceId
 
 
@@ -167,7 +244,7 @@ class DT:
 
 class LL:
     '''lite log'''
-    prefix = "V-T3.2.0"  # 版本标识
+    prefix = "V-T3.3.1"  # 版本标识
     startTime = time.time()
     log_list = []
     printLevel = 0
@@ -229,32 +306,6 @@ class CT:
     charset = 'utf-8'
 
     @staticmethod
-    def encrypt_BodyString(text):
-        """BodyString加密"""
-        key = b"ytUQ7l2ZZu8mLvJZ"
-        iv = b'\x01\x02\x03\x04\x05\x06\x07\x08\t\x01\x02\x03\x04\x05\x06\x07'
-        cipher = AES.new(key, AES.MODE_CBC, iv)
-
-        text = CT.pkcs7padding(text)  # 填充
-        text = text.encode(CT.charset)  # 编码
-        text = cipher.encrypt(text)  # 加密
-        text = base64.b64encode(text).decode(CT.charset)  # Base64编码
-        return text
-
-    @staticmethod
-    def decrypt_BodyString(text):
-        """BodyString解密"""
-        key = b"ytUQ7l2ZZu8mLvJZ"
-        iv = b'\x01\x02\x03\x04\x05\x06\x07\x08\t\x01\x02\x03\x04\x05\x06\x07'
-        cipher = AES.new(key, AES.MODE_CBC, iv)
-
-        text = base64.b64decode(text)  # Base64解码
-        text = cipher.decrypt(text)  # 解密
-        text = text.decode(CT.charset)  # 解码 
-        text = CT.pkcs7unpadding(text)  # 删除填充
-        return text
-
-    @staticmethod
     def pkcs7padding(text: str):
         """明文使用PKCS7填充"""
         remainder = 16 - len(text.encode(CT.charset)) % 16
@@ -264,30 +315,6 @@ class CT:
     def pkcs7unpadding(text: str):
         """去掉填充字符"""
         return text[:-ord(text[-1])]
-
-    @staticmethod
-    def encrypt_CpdailyExtension(text):
-        '''CpdailyExtension加密'''
-        key = 'XCE927=='
-        iv = b"\x01\x02\x03\x04\x05\x06\x07\x08"
-        d = des(key, CBC, iv, pad=None, padmode=PAD_PKCS5)
-
-        text = d.encrypt(text)  # 加密
-        text = base64.b64encode(text)  # base64编码
-        text = text.decode()  # 解码
-        return text
-
-    @staticmethod
-    def decrypt_CpdailyExtension(text):
-        '''CpdailyExtension加密'''
-        key = 'XCE927=='
-        iv = b"\x01\x02\x03\x04\x05\x06\x07\x08"
-        d = des(key, CBC, iv, pad=None, padmode=PAD_PKCS5)
-
-        text = base64.b64decode(text)  # Base64解码
-        text = d.decrypt(text)  # 解密
-        text = text.decode()  # 解码
-        return text
 
 
 class HSF:
