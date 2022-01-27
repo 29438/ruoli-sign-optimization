@@ -24,7 +24,7 @@ pip install -r requirements.txt -t ./ -i https://mirrors.aliyun.com/pypi/simple
 Linux环境可以直接使用下方命令一键部署
 
 ```
-curl -sSO https://raw.fastgit.org/29438/ruoli-sign-optimization/master/actions/setup.sh && bash setup.sh</code>
+curl -sSO https://raw.fastgit.org/29438/ruoli-sign-optimization/master/actions/setup.sh && bash setup.sh
 ```
 
 📅示例 腾讯云函数平台
@@ -48,7 +48,7 @@ curl -sSO https://raw.fastgit.org/29438/ruoli-sign-optimization/master/actions/s
 在编辑器上方的菜单栏中，选择终端>新终端，将下方命令粘贴到弹出的终端中并回车，等待初始化环境完成，可能需要较长时间，请耐心等待(如长时间没反应可以按下CTRL+C键强制终止，然后再次尝试)
 
 ```
-curl -sSO https://raw.fastgit.org/29438/ruoli-sign-optimization/master/actions/setup.sh && bash setup.sh</code>
+curl -sSO https://raw.fastgit.org/29438/ruoli-sign-optimization/master/actions/setup.sh && bash setup.sh
 ```
 
 在编辑器左边的src目录下选择config.yml，配置你的用户签到信息，注意删除多余的示例并注意每行行首的缩进
@@ -57,6 +57,7 @@ curl -sSO https://raw.fastgit.org/29438/ruoli-sign-optimization/master/actions/s
 
 📢 公告
 
+* 2021-11-7更新，秘钥升级
 * 2021-11-7更新，配置文件有修改(<u>请**删掉**配置中不需要用到的**可选项**</u>，不然会出现"今日校园版本过旧，请更新")
 * 2021-12-16更新，[pushplus](https://pushplus.hxtrip.com/index)使用方式更新，需要重新配置
 * 发现bug记得提交issue
