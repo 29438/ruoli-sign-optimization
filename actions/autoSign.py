@@ -275,15 +275,16 @@ class AutoSign:
             "deviceId": self.userInfo['deviceId']
         }
 
-        self.cpdailyExtension = CT.encrypt_CpdailyExtension(
+        self.cpdailyExtension = CpdailyTools.encrypt_CpdailyExtension(
             json.dumps(extension))
 
-        self.bodyString = CT.encrypt_BodyString(json.dumps(self.form))
+        self.bodyString = CpdailyTools.encrypt_BodyString(
+            json.dumps(self.form))
 
         self.submitData = {
             "lon": self.userInfo['lon'],
-            "version": "first_v2",
-            "calVersion": "firstv",
+            "version": self.userInfo['signVersion'],
+            "calVersion": self.userInfo['calVersion'],
             "deviceId": self.userInfo['deviceId'],
             "userId": self.userInfo['username'],
             "systemName": self.userInfo['systemName'],
@@ -294,10 +295,7 @@ class AutoSign:
             "model": self.userInfo['model'],
         }
 
-        sign = ''.join("%s=%s&" % (i, self.submitData[i]) for i in [
-                       "appVersion", "bodyString", "deviceId", "lat", "lon", "model", "systemName", "systemVersion", "userId"]) + "ytUQ7l2ZZu8mLvJZ"
-        sign = HSF.strHash(sign, 5)
-        self.submitData['sign'] = sign
+        self.submitData['sign'] = CpdailyTools.signAbstract(self.submitData)
 
     # 提交签到信息
     def submitForm(self):
