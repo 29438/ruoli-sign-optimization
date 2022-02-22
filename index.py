@@ -1,18 +1,80 @@
-import traceback
+# ====================开始导入模块====================
+# 导入标准库
+import imp
 import os
-from todayLoginService import TodayLoginService
-from actions.autoSign import AutoSign
-from actions.collection import Collection
-from actions.sleepCheck import sleepCheck
-from actions.workLog import workLog
-from actions.sendMessage import SendMessage
-from actions.teacherSign import teacherSign
-from login.Utils import Utils
-from liteTools import *
+import sys
+import codecs
+import traceback
+
+
+# 环境变量初始化
+try:
+    print("==========脚本开始初始化==========")
+except UnicodeEncodeError:
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())  # 设置默认输出编码为utf-8, WARNING!!!但是会影响腾讯云函数日志输出。
+os.chdir(os.path.dirname(os.path.abspath(__file__)))  # 将工作路径设置为脚本位置
+os.environ['TZ'] = "Asia/Shanghai"  # 将时区设为UTC+8
+
+# 检查第三方模块
+try:
+    for i in ("requests", "requests_toolbelt", "urllib3", "bs4", "Crypto", "pyDes", "yaml", "lxml", "rsa"):
+        imp.find_module(i)
+except ImportError as e:
+    # =======WARNING!!!start=======
+    # 在腾讯云函数中将e嵌入字符串中，或者print(e)会导致“except结构中的print()输出”在日志中丢失。但是在Exception中使用格式化，再print出Excetion是正常的。
+    # 同时，似乎不能直接raise ImportError，要raise其他类型的异常“except结构中的print()输出”才会正常。
+    # 同时似乎还要对e创建一些引用，特性太复杂了
+    # 最后放弃了print()出错误信息
+    # e2 = e
+    # c2 = "asdads%sasda"%e
+    # e3 =Exception(c2)
+    # print(e3)
+    # print("ccc")
+    # raise e2
+    # =======WARNING!!!end=======
+    raise ImportError(f"""!!!!!!!!!!!!!!缺少第三方模块(依赖)!!!!!!!!!!!!!!
+请使用pip命令安装或者手动将依赖拖入文件夹
+错误信息: [{e}]""")
+# 检查Crypto是否对应系统版本
+try:
+    from Crypto.Cipher import AES
+except OSError as e:
+    raise OSError(f"""!!!!!!!!!!!!!!Crypto模块版本错误!!!!!!!!!!!!!!
+请不要将linux系统(比如云函数)和windows系统的依赖混用
+错误信息: [{e}]""")
+
+# 检查代码完整性
+try:
+    for i in ("todayLoginService", "actions/autoSign", "actions/collection", "actions/sleepCheck", "actions/workLog", "actions/sendMessage", "actions/teacherSign", "login/Utils", "login/casLogin", "login/iapLogin", "login/RSALogin", "liteTools"):
+        i = os.path.normpath(i)  # 路径适配系统
+        imp.find_module(i)
+except ImportError as e:
+    raise ImportError(f"""!!!!!!!!!!!!!!脚本代码文件缺失!!!!!!!!!!!!!!
+请尝试重新下载代码
+错误信息: [{e}]""")
+# 导入脚本的其他部分(不使用结构时, 格式化代码会将import挪至最上)
+if True:
+    from liteTools import TaskError, RT, DT, LL
+    from login.Utils import Utils
+    from actions.teacherSign import teacherSign
+    from actions.sendMessage import SendMessage
+    from actions.workLog import workLog
+    from actions.sleepCheck import sleepCheck
+    from actions.collection import Collection
+    from actions.autoSign import AutoSign
+    from todayLoginService import TodayLoginService
+# ====================完成导入模块====================
 
 
 def loadConfig():
-    config = DT.loadYml('config.yml')
+    '''配置文件载入'''
+    try:
+        config = DT.loadYml('config.yml')
+    except Exception as e:
+        print(f"""!!!!!!!!!!!!!!读取配置文件出错!!!!!!!!!!!!!!
+请尝试检查配置文件(建议下载VSCode并安装yaml插件进行检查)
+错误信息: {e}""")
+        raise e
     # 全局配置初始化
     config['delay'] = tuple(config.get("delay", [5, 10]))
 
@@ -21,11 +83,11 @@ def loadConfig():
         LL.log(1, f"正在初始化{user['username']}的配置")
         # 初始化静态配置项目
         defaultConfig = {
-            'remarkName': '今日校园用户',
+            'remarkName': '默认备注名',
             'state': None,
-            'model': 'OPPO R11 Plus',
-            'appVersion': '9.0.14',
-            'systemVersion': '4.4.4',
+            'model': 'Xiaomi 10',
+            'appVersion': '9.0.18',
+            'systemVersion': '12',
             'systemName': 'android',
             "signVersion": "first_v3",
             "calVersion": "firstv",
@@ -63,6 +125,7 @@ def loadConfig():
 
 
 def working(user):
+    '''任务执行入口函数'''
     LL.log(1, '准备登录')
     today = TodayLoginService(user)
     today.login()
@@ -118,7 +181,8 @@ def working(user):
 
 
 def main():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))  # 将工作路径设置为脚本位置
+    '''主函数'''
+    print("==========脚本开始执行==========")
 
     # 加载配置
     config = loadConfig()
@@ -179,6 +243,7 @@ def main_handler(event, context):
 
 
 if __name__ == '__main__':
+    '''本地执行入口位置'''
     try:
         main()
     finally:
